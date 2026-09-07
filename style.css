@@ -1,0 +1,474 @@
+:root {
+  --blue-deep: #123354;
+  --blue-mid: #1c4770;
+  --grid-line: rgba(148, 197, 232, 0.16);
+  --grid-line-major: rgba(148, 197, 232, 0.32);
+  --paper: #f3ecd8;
+  --paper-edge: #e3d8b8;
+  --ink: #23241f;
+  --ink-soft: #55564c;
+  --brass: #c68a4e;
+  --brass-dark: #9c6a35;
+  --pencil-red: #b23a24;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Newsreader', serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--blue-deep);
+  font-family: var(--font-mono);
+  color: var(--paper);
+}
+
+/* ---------- The table ---------- */
+
+.grid-canvas {
+  position: absolute;
+  inset: 0;
+  left: 84px;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(var(--grid-line-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line-major) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+  background-color: var(--blue-deep);
+  overflow: auto;
+}
+
+.sheet-layer {
+  position: relative;
+  width: 2400px;
+  height: 1600px;
+}
+
+.empty-hint {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  max-width: 340px;
+  color: rgba(230, 240, 250, 0.55);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.empty-hint b { color: rgba(230, 240, 250, 0.85); }
+
+/* ---------- Pegboard ---------- */
+
+.pegboard {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 84px;
+  background: linear-gradient(180deg, #0d2438, #0a1d2d);
+  border-right: 1px solid rgba(148, 197, 232, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 6px;
+  z-index: 20;
+}
+
+.pegboard-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin-bottom: 14px;
+}
+
+.pegboard-spacer { flex: 1; }
+
+.peg-tool {
+  width: 60px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: rgba(230, 240, 250, 0.75);
+  padding: 8px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+}
+
+.peg-tool svg { width: 22px; height: 22px; }
+
+.peg-tool span { font-size: 9.5px; letter-spacing: 0.04em; }
+
+.peg-tool:hover {
+  border-color: rgba(198, 138, 78, 0.5);
+  color: var(--brass);
+  background: rgba(198, 138, 78, 0.08);
+}
+
+/* ---------- Sheets (notes & PDFs pinned to the table) ---------- */
+
+.sheet {
+  position: absolute;
+  width: 320px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--paper-edge);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  border-radius: 2px;
+  cursor: grab;
+}
+.sheet:active { cursor: grabbing; }
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--paper-edge);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.sheet-head button {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.sheet-head button:hover { color: var(--pencil-red); }
+
+.sheet-body { padding: 12px 14px 16px; }
+
+.sheet textarea {
+  width: 100%;
+  min-height: 140px;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.sheet textarea:focus { outline: none; }
+
+.sheet-pdf canvas {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--paper-edge);
+}
+.sheet-pdf { width: 380px; }
+.pdf-pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.pdf-pager button {
+  background: none;
+  border: 1px solid var(--paper-edge);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+}
+
+/* ---------- Study timer sheet ---------- */
+
+.sheet-timer { width: 236px; }
+
+.timer-dial {
+  position: relative;
+  width: 156px;
+  height: 156px;
+  margin: 4px auto 10px;
+}
+.timer-dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-track { fill: none; stroke: var(--paper-edge); stroke-width: 7; }
+.timer-progress {
+  fill: none;
+  stroke: var(--brass-dark);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s linear;
+}
+.timer-progress.resting { stroke: #4a7c59; }
+
+.timer-readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.timer-clock {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+.timer-phase {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+}
+
+.timer-controls {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.timer-controls button {
+  background: var(--brass-dark);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.timer-controls button.ghost {
+  background: none;
+  border: 1px solid var(--paper-edge);
+  color: var(--ink-soft);
+}
+.timer-controls button.ghost:hover { border-color: var(--brass-dark); color: var(--brass-dark); }
+
+.timer-lengths {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.timer-lengths input {
+  width: 38px;
+  border: 1px solid var(--paper-edge);
+  border-radius: 3px;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 4px;
+  text-align: center;
+  color: var(--ink);
+}
+.timer-lengths input:focus { outline: 1px solid var(--brass-dark); }
+
+.timer-rounds {
+  text-align: center;
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  letter-spacing: 0.06em;
+}
+
+/* pin */
+.sheet::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e0a869, var(--brass-dark));
+  box-shadow: 0 2px 3px rgba(0,0,0,0.4);
+}
+
+/* ---------- Drawers ---------- */
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -340px;
+  width: 320px;
+  height: 100%;
+  background: #0d2438;
+  border-left: 1px solid rgba(148, 197, 232, 0.2);
+  transition: right 0.25s ease;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  color: var(--paper);
+}
+.drawer.open { right: 0; }
+
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.stamp {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  border: 1px solid var(--brass-dark);
+  padding: 3px 8px;
+  border-radius: 3px;
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  color: rgba(230,240,250,0.6);
+  font-size: 20px;
+  cursor: pointer;
+}
+.drawer-close:hover { color: var(--pencil-red); }
+
+.todo-form, .event-form {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.todo-form input, .event-form input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(148,197,232,0.3);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: var(--paper);
+  font-family: var(--font-serif);
+  font-size: 14px;
+}
+.todo-form input::placeholder, .event-form input::placeholder { color: rgba(230,240,250,0.4); }
+.todo-form button, .event-form button {
+  background: var(--brass-dark);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  width: 34px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.todo-list, .event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.todo-list li, .event-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 4px;
+  border-bottom: 1px dashed rgba(148,197,232,0.2);
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+}
+
+.todo-list li.done span.txt { text-decoration: line-through; opacity: 0.5; }
+
+.todo-list li input[type="checkbox"] { accent-color: var(--brass); }
+
+.todo-list li .txt, .event-list li .txt { flex: 1; }
+
+.todo-list li button, .event-list li button {
+  background: none;
+  border: none;
+  color: rgba(230,240,250,0.4);
+  cursor: pointer;
+  font-size: 15px;
+}
+.todo-list li button:hover, .event-list li button:hover { color: var(--pencil-red); }
+
+.cal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.cal-nav button {
+  background: none;
+  border: 1px solid rgba(148,197,232,0.3);
+  color: var(--paper);
+  border-radius: 4px;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 14px;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  border-radius: 4px;
+  color: rgba(230,240,250,0.7);
+  cursor: pointer;
+  position: relative;
+}
+.cal-cell.faded { opacity: 0.25; cursor: default; }
+.cal-cell.today { border: 1px solid var(--brass); }
+.cal-cell.selected { background: rgba(198,138,78,0.3); }
+.cal-cell.has-event::after {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--brass);
+  position: absolute;
+  bottom: 4px;
+}
+.cal-dow {
+  font-size: 10px;
+  text-align: center;
+  color: rgba(230,240,250,0.4);
+}
+
+.cal-day-panel { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cal-day-title { font-size: 12px; color: var(--brass); margin-bottom: 8px; letter-spacing: 0.04em; }
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  background: var(--brass-dark);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 50;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  .pegboard { width: 64px; }
+  .grid-canvas { left: 64px; }
+  .peg-tool { width: 48px; }
+  .peg-tool span { display: none; }
+  .drawer { width: 88vw; right: -100vw; }
+}

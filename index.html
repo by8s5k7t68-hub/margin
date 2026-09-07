@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Margin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="grid-canvas" class="grid-canvas">
+    <div id="sheet-layer" class="sheet-layer"></div>
+  </div>
+
+  <nav class="pegboard" aria-label="Tools">
+    <div class="pegboard-title">MARGIN</div>
+
+    <button class="peg-tool" data-action="new-note" title="New note">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 9h8M8 13h8M8 17h4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Note</span>
+    </button>
+
+    <button class="peg-tool" data-action="import-pdf" title="Import PDF">
+      <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M15 2v5h5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Import</span>
+    </button>
+
+    <button class="peg-tool" data-action="toggle-todo" title="Task list">
+      <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Tasks</span>
+    </button>
+
+    <button class="peg-tool" data-action="toggle-calendar" title="Calendar">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Calendar</span>
+    </button>
+
+    <button class="peg-tool" data-action="new-timer" title="Study timer">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Timer</span>
+    </button>
+
+    <div class="pegboard-spacer"></div>
+
+    <button class="peg-tool" data-action="clear-board" title="Clear the table">
+      <svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Clear</span>
+    </button>
+  </nav>
+
+  <input type="file" id="pdf-input" accept="application/pdf" hidden>
+
+  <!-- Tasks drawer -->
+  <aside id="todo-drawer" class="drawer" aria-label="Tasks">
+    <header class="drawer-head">
+      <span class="stamp">TASK LOG</span>
+      <button class="drawer-close" data-action="toggle-todo">&times;</button>
+    </header>
+    <form id="todo-form" class="todo-form">
+      <input id="todo-input" type="text" placeholder="Add a task&hellip;" autocomplete="off">
+      <button type="submit">+</button>
+    </form>
+    <ul id="todo-list" class="todo-list"></ul>
+  </aside>
+
+  <!-- Calendar drawer -->
+  <aside id="calendar-drawer" class="drawer" aria-label="Calendar">
+    <header class="drawer-head">
+      <span class="stamp">SCHEDULE</span>
+      <button class="drawer-close" data-action="toggle-calendar">&times;</button>
+    </header>
+    <div class="cal-nav">
+      <button data-action="cal-prev">&larr;</button>
+      <span id="cal-label"></span>
+      <button data-action="cal-next">&rarr;</button>
+    </div>
+    <div id="cal-grid" class="cal-grid"></div>
+    <div id="cal-day-panel" class="cal-day-panel">
+      <div class="cal-day-title">Pick a date</div>
+      <form id="event-form" class="event-form">
+        <input id="event-input" type="text" placeholder="Add an event&hellip;" autocomplete="off">
+        <button type="submit">+</button>
+      </form>
+      <ul id="event-list" class="event-list"></ul>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
